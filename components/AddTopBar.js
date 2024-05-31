@@ -2,9 +2,11 @@ import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 import React, { useContext } from "react";
 import { DContexts } from "../contexts/DContexts";
 import useStyles from "../constants/styles";
+
 export default function AddTopBar({ acton }) {
   const { primarycolor } = useContext(DContexts);
-  css = useStyles();
+  const css = useStyles();
+
   return (
     <View style={styles.AddTopBar}>
       <View style={styles.atp_icon}></View>
@@ -21,6 +23,7 @@ export default function AddTopBar({ acton }) {
     </View>
   );
 }
+
 const styles = StyleSheet.create({
   AddTopBar: {
     margin: 10,
@@ -35,7 +38,6 @@ const styles = StyleSheet.create({
   },
   atp_icon_text: {
     fontWeight: "400",
-
     fontSize: 17,
     margin: 5,
   },

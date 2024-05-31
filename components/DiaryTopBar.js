@@ -5,24 +5,23 @@ import { useNavigation } from "@react-navigation/native";
 import { deleteDiaryById } from "../constants/Database";
 import { DContexts } from "../contexts/DContexts";
 import useStyles from "../constants/styles";
+
 export default function DiaryTopBar({ acton, diaryid }) {
   const navigation = useNavigation();
   const { setChangedSomething } = useContext(DContexts);
-
   const { primarycolor } = useContext(DContexts);
-  css = useStyles();
+  const css = useStyles();
+
   const delDiary = async () => {
-    console.log(diaryid);
     try {
       await deleteDiaryById(diaryid);
-
       setChangedSomething(Math.floor(Math.random() * (5000 - 0 + 1)) + 0);
-
       navigation.navigate("Home");
     } catch (error) {
       console.error("Failed to delete Diary:", error);
     }
   };
+
   const showAlert = () =>
     Alert.alert(
       "Delete Diary",
@@ -38,6 +37,7 @@ export default function DiaryTopBar({ acton, diaryid }) {
         cancelable: true,
       }
     );
+
   return (
     <View style={styles.AddTopBar}>
       <TouchableOpacity
@@ -69,6 +69,7 @@ export default function DiaryTopBar({ acton, diaryid }) {
     </View>
   );
 }
+
 const styles = StyleSheet.create({
   AddTopBar: {
     margin: 10,

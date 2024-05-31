@@ -15,8 +15,10 @@ import ValidatePin from "./screens/ValidatePin";
 import EditUsername from "./screens/EditUsername";
 import EditPin from "./screens/EditPin";
 import { useFonts } from "expo-font";
+
 const Stack = createNativeStackNavigator();
 SplashScreen.preventAutoHideAsync();
+
 export default function App() {
   const [changedsomething, setChangedSomething] = useState("");
   const [primarycolor, setPrimaryColor] = useState("#7856FF");
@@ -30,6 +32,7 @@ export default function App() {
   const [fontsLoaded, fontError] = useFonts({
     Poppins: require("./assets/fonts/poppins.ttf"),
   });
+
   // Load colors and hide splash screen
   useEffect(() => {
     const loadColors = async () => {
@@ -43,12 +46,8 @@ export default function App() {
           textColor: "black",
         };
 
-        const loadedPrimaryColor = await SecureStore.getItemAsync(
-          "primarycolor"
-        );
-        const loadedOpacityColor = await SecureStore.getItemAsync(
-          "opacitycolor"
-        );
+        const loadedPrimaryColor = await SecureStore.getItemAsync("primarycolor");
+        const loadedOpacityColor = await SecureStore.getItemAsync("opacitycolor");
         const loadedBgColor = await SecureStore.getItemAsync("bgcolor");
         const loadedCardColor = await SecureStore.getItemAsync("cardcolor");
         const loadedTextColor = await SecureStore.getItemAsync("textcolor");
@@ -56,22 +55,17 @@ export default function App() {
         if (loadedUsername !== "") {
           setMyUname(loadedUsername);
         }
+
         // Check and save colors if they don't exist
         if (loadedPrimaryColor === null) {
-          await SecureStore.setItemAsync(
-            "primarycolor",
-            Deafaults.primaryColor
-          );
+          await SecureStore.setItemAsync("primarycolor", Deafaults.primaryColor);
           setPrimaryColor(Deafaults.primaryColor);
         } else {
           setPrimaryColor(loadedPrimaryColor);
         }
 
         if (loadedOpacityColor === null) {
-          await SecureStore.setItemAsync(
-            "opacitycolor",
-            Deafaults.opacityColor
-          );
+          await SecureStore.setItemAsync("opacitycolor", Deafaults.opacityColor);
           setOpacityColor(Deafaults.opacityColor);
         } else {
           setOpacityColor(loadedOpacityColor);
@@ -101,13 +95,14 @@ export default function App() {
         console.error("Error loading variables from Secure Store:", error);
       } finally {
         // Hide the splash screen after loading
-
         SplashScreen.hideAsync();
       }
     };
+
     initializeDatabase();
     loadColors();
   }, []);
+
   useEffect(() => {
     SecureStoreModel.itemExists("pin").then((exists) => {
       if (exists) {
@@ -115,6 +110,7 @@ export default function App() {
       }
     });
   }, [isPinSet]);
+
   useEffect(() => {
     SecureStoreModel.itemExists("username").then((exists) => {
       if (exists) {
@@ -122,6 +118,7 @@ export default function App() {
       }
     });
   }, [isUnameSet]);
+
   if (isUnameSet) {
     if (isPinSet) {
       return (
@@ -147,8 +144,7 @@ export default function App() {
             <Stack.Navigator
               screenOptions={{
                 headerStyle: {
-                  marginTop:
-                    Platform.OS === "ios" ? 0 : StatusBar.currentHeight,
+                  marginTop: Platform.OS === "ios" ? 0 : StatusBar.currentHeight,
                 },
               }}
             >
@@ -162,7 +158,6 @@ export default function App() {
                 component={HomeTabs}
                 options={{ headerShown: false }}
               />
-
               <Stack.Screen
                 name="Diary"
                 component={Diary}

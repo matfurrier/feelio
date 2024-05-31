@@ -4,10 +4,11 @@ import { Ionicons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import { DContexts } from "../contexts/DContexts";
 import useStyles from "../constants/styles";
+
 export default function EditTopBar({ acton }) {
   const { primarycolor } = useContext(DContexts);
   const navigation = useNavigation();
-  css = useStyles();
+  const css = useStyles();
 
   return (
     <View style={styles.AddTopBar}>
@@ -30,6 +31,7 @@ export default function EditTopBar({ acton }) {
     </View>
   );
 }
+
 const styles = StyleSheet.create({
   AddTopBar: {
     margin: 10,

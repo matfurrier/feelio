@@ -5,6 +5,7 @@ import { fetchWeatherData } from "../api/weatherAPI";
 import { getCurrentLocation } from "../utils/location";
 import { DContexts } from "../contexts/DContexts";
 import { LinearGradient } from "expo-linear-gradient";
+
 const Dashboard = () => {
   const [weatherData, setWeatherData] = useState(null);
   const [locationData, setLocationData] = useState(null);

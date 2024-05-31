@@ -4,7 +4,6 @@ import {
   Text,
   ScrollView,
   SafeAreaView,
-  TextInput,
   StyleSheet,
 } from "react-native";
 import useStyles from "../constants/styles";
@@ -12,22 +11,27 @@ import DiaryTopBar from "../components/DiaryTopBar";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { getDiary } from "../constants/Database";
 import { DContexts } from "../contexts/DContexts";
+import AttachmentGallery from "../components/AttachmentGallery";
+import MapComponent from "../components/MapView";
+
 export default function Diary() {
   const navigation = useNavigation();
   const route = useRoute();
   const diaryid = route.params.id;
-  console.log(diaryid);
   const [diary, setDiary] = useState([]);
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [day, setDay] = useState(null);
   const [month, setMonth] = useState(null);
   const [year, setYear] = useState(null);
+  const [attachments, setAttachments] = useState([]);
+  const [location, setLocation] = useState(null);
 
   const { changedsomething } = useContext(DContexts);
   const { setChangedSomething } = useContext(DContexts);
 
-  css = useStyles();
+  const css = useStyles();
+  
   useEffect(() => {
     getDiary(diaryid)
       .then((data) => {
@@ -37,6 +41,13 @@ export default function Diary() {
           setDay(data[0].day);
           setMonth(data[0].monthname);
           setYear(data[0].year);
+          const attachmentList = [];
+          if (data[0].audioUri) attachmentList.push({ type: 'audio', uri: data[0].audioUri });
+          if (data[0].videoUri) attachmentList.push({ type: 'video', uri: data[0].videoUri });
+          if (data[0].imageUri) attachmentList.push({ type: 'image', uri: data[0].imageUri });
+          if (data[0].documentUri) attachmentList.push({ type: 'document', uri: data[0].documentUri });
+          setAttachments(attachmentList);
+          setLocation(data[0].location);
           setDiary(data);
         }
       })
@@ -48,6 +59,7 @@ export default function Diary() {
   const goToEdit = (did) => {
     navigation.navigate("Edit", { id: did });
   };
+
   return (
     <ScrollView style={css.container}>
       <SafeAreaView>
@@ -58,11 +70,16 @@ export default function Diary() {
           </Text>
           <Text style={{ ...css.txt, ...styles.title }}>{title}</Text>
           <Text style={{ ...css.txt, ...styles.content }}>{content}</Text>
+          <AttachmentGallery attachments={attachments} />
+          {location && (
+            <MapComponent locations={[{ latitude: location.latitude, longitude: location.longitude, title: 'Location', description: 'Visited location' }]} />
+          )}
         </View>
       </SafeAreaView>
     </ScrollView>
   );
 }
+
 const styles = StyleSheet.create({
   title: {
     margin: 10,

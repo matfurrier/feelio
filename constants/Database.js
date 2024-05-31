@@ -17,7 +17,10 @@ const initializeDatabase = () => {
                 hour INTEGER,
                 minute INTEGER,
                 monthname TEXT,
-                timestamp TEXT
+                timestamp TEXT,
+                audioUri TEXT,
+                videoUri TEXT,
+                location TEXT
             );`
     );
   });
@@ -33,13 +36,37 @@ const insertDiary = (
   hour,
   minute,
   monthname,
-  timestamp
+  timestamp,
+  audioUri = null,
+  videoUri = null,
+  location = null,
+  tags = [],
+  imageUri = null,
+  documentUri = null
 ) => {
   return new Promise((resolve, reject) => {
+    const dateFormatted = `${day}-${month + 1}-${year}`;
     db.transaction((tx) => {
       tx.executeSql(
-        "INSERT INTO diary (title, content, year, month, day,hour,minute,monthname,timestamp) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
-        [title, content, year, month, day, hour, minute, monthname, timestamp],
+        "INSERT INTO diary (title, content, year, month, day, hour, minute, monthname, timestamp, audioUri, videoUri, location, tags, imageUri, documentUri, dateFormatted) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+        [
+          title,
+          content,
+          year,
+          month,
+          day,
+          hour,
+          minute,
+          monthname,
+          timestamp,
+          audioUri,
+          videoUri,
+          location,
+          JSON.stringify(tags),
+          imageUri,
+          documentUri,
+          dateFormatted,
+        ],
         (_, results) => {
           resolve(results);
         },
@@ -149,6 +176,22 @@ const clearTable = (tableName) => {
     });
   });
 };
+const searchDiaries = (query) => {
+  return new Promise((resolve, reject) => {
+    db.transaction((tx) => {
+      tx.executeSql(
+        'SELECT * FROM diary WHERE title LIKE ? OR content LIKE ? OR tags LIKE ?',
+        [`%${query}%`, `%${query}%`, `%${query}%`],
+        (_, { rows: { _array } }) => {
+          resolve(_array);
+        },
+        (_, error) => {
+          reject(error);
+        }
+      );
+    });
+  });
+};
 
 // Export the functions for use in other files
 export {
@@ -159,4 +202,5 @@ export {
   clearTable,
   getDiary,
   updateDiary,
+  searchDiaries,
 };

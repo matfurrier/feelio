@@ -4,12 +4,14 @@ import DialPad from "../components/DialPad";
 import SecureStoreModel from "../constants/SecureStoreModel";
 import { DContexts } from "../contexts/DContexts";
 import useStyles from "../constants/styles";
+
 const CreatePin = () => {
   const [pin, setPin] = useState("");
   const { setPinSet } = useContext(DContexts);
   const css = useStyles();
   const { bgcolor } = useContext(DContexts);
   const { primarycolor } = useContext(DContexts);
+
   // Handle button press
   const handlePress = (value) => {
     if (value === "backspace") {
@@ -32,7 +34,6 @@ const CreatePin = () => {
   // Function to authenticate the PIN
   const authenticatePin = (pin) => {
     // Replace the following logic with your actual authentication logic
-
     SecureStoreModel.saveItem("pin", pin);
     setPin("");
     setPinSet(true);

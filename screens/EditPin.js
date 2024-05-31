@@ -6,24 +6,22 @@ import { DContexts } from "../contexts/DContexts";
 import { useNavigation } from "@react-navigation/native";
 import { Ionicons } from "@expo/vector-icons";
 import useStyles from "../constants/styles";
+
 const EditPin = () => {
   const [pin, setPin] = useState("");
   const { primarycolor } = useContext(DContexts);
   const css = useStyles();
   const { bgcolor } = useContext(DContexts);
   const navigation = useNavigation();
-  // Handle button press
+
   const handlePress = (value) => {
     if (value === "backspace") {
-      // Handle backspace press
       setPin((prevPin) => prevPin.slice(0, -1));
     } else {
-      // Handle number press
       if (pin.length < 4) {
         const newPin = pin + value.toString();
         setPin(newPin);
 
-        // If the new pin length is exactly 4, automatically authenticate
         if (newPin.length === 4) {
           authenticatePin(newPin);
         }
@@ -31,12 +29,9 @@ const EditPin = () => {
     }
   };
 
-  // Function to authenticate the PIN
   const authenticatePin = (pin) => {
-    // Replace the following logic with your actual authentication logic
     setPin("");
     SecureStoreModel.updateItem("pin", pin);
-
     navigation.navigate("Home");
     alert("You have changed your pin successfully!");
   };

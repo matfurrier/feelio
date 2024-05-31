@@ -12,6 +12,7 @@ import EditTopBar from "../components/EditTopBar";
 import { useRoute, useNavigation } from "@react-navigation/native";
 import { getDiary, updateDiary } from "../constants/Database";
 import { DContexts } from "../contexts/DContexts";
+import TagInput from 'react-native-tags-input';
 
 export default function Edit() {
   const css = useStyles();
@@ -26,18 +27,34 @@ export default function Edit() {
   const [day, setDay] = useState(null);
   const [month, setMonth] = useState(null);
   const [year, setYear] = useState(null);
+  const [audioUri, setAudioUri] = useState(null);
+  const [videoUri, setVideoUri] = useState(null);
+  const [location, setLocation] = useState(null);
+  const [tags, setTags] = useState({ tag: '', tagsArray: [] });
+
   const { changedsomething } = useContext(DContexts);
   const { setChangedSomething } = useContext(DContexts);
   const { txtcolor } = useContext(DContexts);
+
+  const updateTagState = (state) => {
+    setTags(state);
+  };
+  
   useEffect(() => {
     getDiary(diaryid)
       .then((data) => {
-        onChangeTitle(data[0].title);
-        onChangeText(data[0].content);
-        setDay(data[0].day);
-        setMonth(data[0].monthname);
-        setYear(data[0].year);
-        setDiary(data);
+        if (data[0]) {
+          onChangeTitle(data[0].title);
+          onChangeText(data[0].content);
+          setTags({ tag: '', tagsArray: data[0].tags });
+          setDay(data[0].day);
+          setMonth(data[0].monthname);
+          setYear(data[0].year);
+          setAudioUri(data[0].audioUri);
+          setVideoUri(data[0].videoUri);
+          setLocation(data[0].location);
+          setDiary(data);
+        }
       })
       .catch((error) => {
         console.error("Failed to get diaries:", error);
@@ -47,15 +64,13 @@ export default function Edit() {
   const editDiary = async () => {
     try {
       await updateDiary(diaryid, text, value);
-      console.log(value);
-      console.log("Diary Updated Successfully");
       setChangedSomething(Math.floor(Math.random() * (5000 - 0 + 1)) + 0);
-
       navigation.navigate("Diary", { id: diaryid });
     } catch (error) {
-      console.error("Failed to insert Diary:", error);
+      console.error("Failed to update Diary:", error);
     }
   };
+
 
   return (
     <ScrollView style={css.container}>
@@ -71,26 +86,25 @@ export default function Edit() {
             placeholderTextColor={txtcolor}
           />
           <Text style={css.greytext}>Text</Text>
-          <View>
-            <TextInput
-              editable
-              multiline
-              numberOfLines={10}
-              maxLength={10000}
-              placeholder="How are you feeling?"
-              onChangeText={(text) => onChangeText(text)}
-              value={value}
-              style={{ ...css.txt, padding: 15 }}
-              textAlignVertical="top"
-              autoFocus={true}
-              placeholderTextColor={txtcolor}
-            />
-          </View>
+          <RichEditor
+            ref={richText}
+            onChange={(value) => onChangeText(value)}
+            initialContentHTML={value}
+            editorStyle={{ backgroundColor: 'white', color: 'black' }}
+            placeholder="How are you feeling?"
+          />
+          <RichToolbar editor={richText} actions={['bold', 'italic', 'underline', 'strikethrough']} />
+          <TagInput
+            updateState={updateTagState}
+            tags={tags}
+            placeholder="Edit tags..."
+          />
         </View>
       </SafeAreaView>
     </ScrollView>
   );
 }
+
 const styles = StyleSheet.create({
   title_input: {
     margin: 15,

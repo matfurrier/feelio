@@ -1,9 +1,11 @@
 import { View, Text, StyleSheet } from "react-native";
 import { DContexts } from "../contexts/DContexts";
 import React, { useContext } from "react";
+
 export default function ChipNav({ name, active }) {
   const { primarycolor } = useContext(DContexts);
   const { opacitycolor } = useContext(DContexts);
+
   return (
     <View
       style={
@@ -16,6 +18,7 @@ export default function ChipNav({ name, active }) {
     </View>
   );
 }
+
 const styles = StyleSheet.create({
   activeButton: {
     padding: 10,
@@ -39,7 +42,6 @@ const styles = StyleSheet.create({
     color: "white",
     justifyContent: "space-between",
     alignItems: "center",
-    maxHeight: 80,
     maxHeight: 80,
     minWidth: 90,
   },

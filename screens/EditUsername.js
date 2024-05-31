@@ -10,6 +10,7 @@ import {
 import SecureStoreModel from "../constants/SecureStoreModel";
 import { DContexts } from "../contexts/DContexts";
 import useStyles from "../constants/styles";
+
 const EditUsername = () => {
   const { setUnameSet } = useContext(DContexts);
   const { isUnameSet } = useContext(DContexts);
@@ -18,6 +19,7 @@ const EditUsername = () => {
   const { txtcolor } = useContext(DContexts);
   const { primarycolor } = useContext(DContexts);
   const { setMyUname } = useContext(DContexts);
+
   const handlePress = () => {
     SecureStoreModel.saveItem("username", uname);
     setMyUname(uname);
@@ -55,7 +57,6 @@ const EditUsername = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-
     margin: 20,
     paddingTop: 20,
   },
@@ -67,7 +68,6 @@ const styles = StyleSheet.create({
     backgroundColor: "#f5f5f5",
     borderRadius: 10,
   },
-
   btn: {
     padding: 20,
     backgroundColor: "#7856FF",

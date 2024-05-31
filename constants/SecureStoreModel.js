@@ -1,7 +1,6 @@
 import * as SecureStore from "expo-secure-store";
 
 class SecureStoreModel {
-  // Save a key-value pair
   static async saveItem(key, value) {
     try {
       await SecureStore.setItemAsync(key, value);
@@ -11,7 +10,6 @@ class SecureStoreModel {
     }
   }
 
-  // Update a key-value pair
   static async updateItem(key, value) {
     try {
       await SecureStore.setItemAsync(key, value);
@@ -21,18 +19,16 @@ class SecureStoreModel {
     }
   }
 
-  // Check if a key exists
   static async itemExists(key) {
     try {
       const value = await SecureStore.getItemAsync(key);
-      return value !== null; // Return true if the key exists and has a value
+      return value !== null;
     } catch (error) {
       console.error(`Failed to check if item exists: ${error}`);
       return false;
     }
   }
 
-  // Retrieve a key-value pair
   static async getItem(key) {
     try {
       const value = await SecureStore.getItemAsync(key);
@@ -49,5 +45,4 @@ class SecureStoreModel {
   }
 }
 
-// Export the SecureStoreModel class
 export default SecureStoreModel;

@@ -4,21 +4,25 @@ import {
   Text,
   View,
   ScrollView,
+  TextInput,
   TouchableOpacity,
   StatusBar,
 } from "react-native";
 import { Fontisto, Ionicons } from "@expo/vector-icons";
+import { Calendar } from 'react-native-calendars';
 
 import SecureStoreModel from "../constants/SecureStoreModel";
 import Yearbtn from "../components/Yearbtn";
 import ChipNav from "../components/ChipNav";
 import DiaryList from "../components/DiaryList";
-import { initializeDatabase, getAllDiaries } from "../constants/Database";
+import { initializeDatabase, getAllDiaries, searchDiaries } from "../constants/Database";
 import { DContexts } from "../contexts/DContexts";
 import { useState, useEffect, useContext } from "react";
 import NoResultComponent from "../components/NoResultComponent";
 import useStyles from "../constants/styles";
 import Dashboard from "../components/Dashboard";
+import Timeline from '../components/Timeline';
+
 export default function Home() {
   const date = new Date();
   const monthIndex = date.getMonth();
@@ -39,8 +43,7 @@ export default function Home() {
   ];
   const monthName = monthNames[monthIndex];
   const currentMonthIndex = monthNames.indexOf(monthName);
-
-  // Create a new array with the current month and year first
+  const [selectedTag, setSelectedTag] = useState("");
   const rearrangedMonths = [
     ...monthNames.slice(currentMonthIndex),
     ...monthNames.slice(0, currentMonthIndex),
@@ -50,11 +53,11 @@ export default function Home() {
   for (let i = 0; i < 10; i++) {
     pastTenYears.push(currentYear - i);
   }
-  // States
 
   const [yearfilter, setyearfilter] = useState(currentYear);
   const [monthfilter, setmonthfilter] = useState(monthName);
   const [diaries, setDiaries] = useState([]);
+  const [searchQuery, setSearchQuery] = useState('');
   const { changedsomething } = useContext(DContexts);
   const { primarycolor } = useContext(DContexts);
   const { myuname } = useContext(DContexts);
@@ -63,41 +66,47 @@ export default function Home() {
   const { setbgColor } = useContext(DContexts);
   const { setCardColor } = useContext(DContexts);
   const { settxtColor } = useContext(DContexts);
+
   useEffect(() => {
-    getAllDiaries(yearfilter, monthfilter)
-      .then((diary) => {
-        setDiaries(diary);
-      })
-      .catch((error) => {
-        console.error("Failed to get diaries:", error);
-      });
-  }, [yearfilter, monthfilter, changedsomething]);
-  if (bgcolor == "#f5f5f5") {
-    lightmode = true;
-  } else {
-    lightmode = false;
-  }
+    if (searchQuery) {
+      searchDiaries(searchQuery)
+        .then((results) => {
+          setDiaries(results);
+        })
+        .catch((error) => {
+          console.error('Failed to search diaries:', error);
+        });
+    } else {
+      getAllDiaries(yearfilter, monthfilter, selectedTag)
+        .then((diary) => {
+          setDiaries(diary);
+        })
+        .catch((error) => {
+          console.error("Failed to get diaries:", error);
+        });
+    }
+  }, [yearfilter, monthfilter, changedsomething, selectedTag, searchQuery]);
+
+  const lightmode = bgcolor === "#f5f5f5";
+
   const changeTheme = () => {
     if (lightmode) {
       setbgColor("#15202B");
-
       SecureStoreModel.saveItem("bgcolor", "#15202B");
-
       setCardColor("#273340");
       settxtColor("white");
       SecureStoreModel.saveItem("cardcolor", "#273340");
       SecureStoreModel.saveItem("textcolor", "white");
     } else {
       setbgColor("#f5f5f5");
-
       SecureStoreModel.saveItem("bgcolor", "#f5f5f5");
-
       setCardColor("white");
       settxtColor("black");
       SecureStoreModel.saveItem("cardcolor", "white");
       SecureStoreModel.saveItem("textcolor", "black");
     }
   };
+
   return (
     <>
       <StatusBar
@@ -107,28 +116,27 @@ export default function Home() {
       />
       <ScrollView style={css.container}>
         <View style={styles.topnav}>
-          <View class="topnavuname">
+          <View className="topnavuname">
             <Text style={{ ...styles.tpn1, ...css.txt }}>Good day!</Text>
             <Text style={{ ...styles.tpn2, ...css.txt }}>{myuname}</Text>
           </View>
-          {lightmode ? (
-            <TouchableOpacity onPress={changeTheme}>
-              <Ionicons
-                name="moon-outline"
-                style={{ margin: 10, fontSize: 30 }}
-                color={primarycolor}
-              />
-            </TouchableOpacity>
-          ) : (
-            <TouchableOpacity onPress={changeTheme}>
-              <Ionicons
-                name="sunny"
-                style={{ margin: 10, fontSize: 30 }}
-                color={primarycolor}
-                onpress={changeTheme}
-              />
-            </TouchableOpacity>
-          )}
+          <TouchableOpacity onPress={changeTheme}>
+            <Ionicons
+              name={lightmode ? "moon-outline" : "sunny"}
+              style={{ margin: 10, fontSize: 30 }}
+              color={primarycolor}
+            />
+          </TouchableOpacity>
+        </View>
+
+        <View style={styles.searchContainer}>
+          <Ionicons name="search" size={20} color="gray" />
+          <TextInput
+            style={styles.searchInput}
+            placeholder="Search diaries..."
+            value={searchQuery}
+            onChangeText={(text) => setSearchQuery(text)}
+          />
         </View>
 
         <Dashboard />
@@ -165,9 +173,16 @@ export default function Home() {
             ))}
           </ScrollView>
         </View>
+
+        <Calendar
+          onDayPress={(day) => {
+            setDayFilter(day.dateString);
+          }}
+          markedDates={markedDates}
+        />
+
         {diaries.length > 0 ? (
           diaries.map((diary, index) => (
-            // Assign a unique key prop to each DiaryList component
             <DiaryList
               key={diary.id || index}
               id={diary.id}
@@ -177,9 +192,9 @@ export default function Home() {
             />
           ))
         ) : (
-          // Render another component if the array has no value
-          <NoResultComponent /> // Replace NoResultsComponent with your component
+          <NoResultComponent />
         )}
+        <Timeline entries={diaries} />
       </ScrollView>
     </>
   );
@@ -195,9 +210,34 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
   },
-
   tpn2: {
     fontSize: 24,
     fontWeight: "bold",
+  },
+  searchContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#f0f0f0',
+    borderRadius: 10,
+    padding: 10,
+    margin: 20,
+    marginBottom: 10,
+  },
+  searchInput: {
+    marginLeft: 10,
+    fontSize: 16,
+    flex: 1,
+  },
+  tag: {
+    margin: 5,
+    padding: 10,
+    backgroundColor: "#f0f0f0",
+    borderRadius: 10,
+  },
+  selectedTag: {
+    margin: 5,
+    padding: 10,
+    backgroundColor: "#7856FF",
+    borderRadius: 10,
   },
 });

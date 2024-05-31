@@ -2,6 +2,7 @@ import { Ionicons } from "@expo/vector-icons";
 import React, { useContext } from "react";
 import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
 import { DContexts } from "../contexts/DContexts";
+
 const DialPad = ({ onPress }) => {
   const { bgcolor } = useContext(DContexts);
 

@@ -1,14 +1,12 @@
 import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
-import { Fontisto, Ionicons } from "@expo/vector-icons";
-import react, { useContext } from "react";
+import React, { useContext } from "react";
 import { DContexts } from "../contexts/DContexts";
-
 import SecureStoreModel from "../constants/SecureStoreModel";
+
 export default function CircularChip({
   name,
   backcolor,
   color,
-
   type,
   opacity,
 }) {
@@ -17,30 +15,32 @@ export default function CircularChip({
   const { setbgColor } = useContext(DContexts);
   const { setCardColor } = useContext(DContexts);
   const { settxtColor } = useContext(DContexts);
+
   const changeColor = () => {
     setPrimaryColor(backcolor);
     setOpacityColor(opacity);
     SecureStoreModel.saveItem("primarycolor", backcolor);
     SecureStoreModel.saveItem("opacitycolor", opacity);
   };
+
   const changeTheme = () => {
     setbgColor(backcolor);
-
     SecureStoreModel.saveItem("bgcolor", backcolor);
 
-    if (name == "Dark") {
+    if (name === "Dark") {
       setCardColor("#273340");
       settxtColor("white");
       SecureStoreModel.saveItem("cardcolor", "#273340");
       SecureStoreModel.saveItem("textcolor", "white");
-    } else if (name == "Light") {
+    } else if (name === "Light") {
       setCardColor("white");
       settxtColor("black");
       SecureStoreModel.saveItem("cardcolor", "white");
       SecureStoreModel.saveItem("textcolor", "black");
     }
   };
-  if (type == "theme") {
+
+  if (type === "theme") {
     return (
       <TouchableOpacity
         style={{ backgroundColor: backcolor, ...styles.circle }}
@@ -49,7 +49,7 @@ export default function CircularChip({
         <Text style={{ color: color }}>{name}</Text>
       </TouchableOpacity>
     );
-  } else if (type == "color") {
+  } else if (type === "color") {
     return (
       <TouchableOpacity
         style={{ backgroundColor: backcolor, ...styles.circle }}
